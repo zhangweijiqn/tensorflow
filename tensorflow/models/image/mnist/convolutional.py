@@ -1,3 +1,4 @@
+#coding=utf8
 # Copyright 2015 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,6 +34,7 @@ from six.moves import urllib
 from six.moves import xrange  # pylint: disable=redefined-builtin
 import tensorflow as tf
 
+#定义参数：数据库下载地址，深度学习的参数设置
 SOURCE_URL = 'http://yann.lecun.com/exdb/mnist/'
 WORK_DIRECTORY = 'data'
 IMAGE_SIZE = 28
@@ -50,7 +52,7 @@ EVAL_FREQUENCY = 100  # Number of steps between evaluations.
 tf.app.flags.DEFINE_boolean("self_test", False, "True if running a self test.")
 FLAGS = tf.app.flags.FLAGS
 
-
+#根据参数设置，下载相应数据
 def maybe_download(filename):
   """Download the data from Yann's website, unless it's already here."""
   if not tf.gfile.Exists(WORK_DIRECTORY):
@@ -63,7 +65,7 @@ def maybe_download(filename):
     print('Successfully downloaded', filename, size, 'bytes.')
   return filepath
 
-
+#读取下载文件的数据，转换成tensorflow识别的4维向量，并把数据归一化到[-0.5,0.5]
 def extract_data(filename, num_images):
   """Extract the images into a 4D tensor [image index, y, x, channels].
 
@@ -78,7 +80,7 @@ def extract_data(filename, num_images):
     data = data.reshape(num_images, IMAGE_SIZE, IMAGE_SIZE, 1)
     return data
 
-
+#提取图像数据对应的标签
 def extract_labels(filename, num_images):
   """Extract the labels into a vector of int64 label IDs."""
   print('Extracting', filename)
