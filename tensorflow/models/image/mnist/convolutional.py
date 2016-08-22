@@ -113,6 +113,7 @@ def error_rate(predictions, labels):
 
 
 def main(argv=None):  # pylint: disable=unused-argument
+  # FLAGS.self_test=True
   if FLAGS.self_test:
     print('Running self-test.')
     train_data, train_labels = fake_data(256)
@@ -154,6 +155,7 @@ def main(argv=None):  # pylint: disable=unused-argument
   # The variables below hold all the trainable weights. They are passed an
   # initial value which will be assigned when we call:
   # {tf.initialize_all_variables().run()}
+  #定义存储网络参数的变量，每次训练只是更新迭代各个变量的值，实际上，我们也可以从这里推测出网络的结构
   conv1_weights = tf.Variable(
       tf.truncated_normal([5, 5, NUM_CHANNELS, 32],  # 5x5 filter, depth 32.
                           stddev=0.1,
@@ -220,6 +222,7 @@ def main(argv=None):  # pylint: disable=unused-argument
     return tf.matmul(hidden, fc2_weights) + fc2_biases
 
   # Training computation: logits + cross-entropy loss.
+    #定义网络的loss和正则项，即优化的目标函数，用于误差反传
   logits = model(train_data_node, True)
   loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(
       logits, train_labels_node))
@@ -232,6 +235,7 @@ def main(argv=None):  # pylint: disable=unused-argument
 
   # Optimizer: set up a variable that's incremented once per batch and
   # controls the learning rate decay.
+  # 定义优化目标函数时，学习率，梯度动量的迭代策略
   batch = tf.Variable(0)
   # Decay once per epoch, using an exponential schedule starting at 0.01.
   learning_rate = tf.train.exponential_decay(
@@ -246,6 +250,7 @@ def main(argv=None):  # pylint: disable=unused-argument
                                                        global_step=batch)
 
   # Predictions for the current training minibatch.
+  # 预测当前输出，以及利用训练好的模型预测验证集的输出
   train_prediction = tf.nn.softmax(logits)
 
   # Predictions for the test and validation, which we'll compute less often.
@@ -254,6 +259,7 @@ def main(argv=None):  # pylint: disable=unused-argument
   # Small utility function to evaluate a dataset by feeding batches of data to
   # {eval_data} and pulling the results from {eval_predictions}.
   # Saves memory and enables this to run on smaller GPUs.
+  # 为了节约内存，每次使用较小size的数据进行验证，比如batch size等
   def eval_in_batches(data, sess):
     """Get all predictions for a dataset by running it in small batches."""
     size = data.shape[0]
